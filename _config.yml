@@ -6,9 +6,8 @@ url: ""
 page_excerpts: true
 markdown: kramdown
 theme: minima
-author:
-  name: Arsène Pérard-Gayot
-  email: arsene.perard@laposte.net
+author: Arsène Pérard-Gayot
+email: arsene.perard@laposte.net
 minima:
   skin: dark
   social_links:
