@@ -1,0 +1,18 @@
+title: Mad man's corner
+description: >-
+  This site is a collection of posts on the topics of Computer Graphics, Programming Language Design, or Compilers.
+baseurl: ""
+url: ""
+page_excerpts: true
+markdown: kramdown
+theme: minima
+author:
+  name: Arsène Pérard-Gayot
+  email: arsene.perard@laposte.net
+minima:
+  skin: dark
+  social_links:
+    github: madmann91
+    twitter: ""
+plugins:
+  - jekyll-feed
