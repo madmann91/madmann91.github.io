@@ -22,7 +22,7 @@ Its performance will not be optimal nor very poor, just average. Similarly, the 
 Readers that want the best performance should implement this first, then apply the optimizations mentioned in the previous blog posts.
 
 The code presented here is going to be C++, but it should be straightforward to convert into any other programming language.
-It is available in full [here](/assets/bvh.cpp).
+It is available in full [here](/assets/bvh.cpp) (see [Running and Testing the Example Code](#running-and-testing-the-example-code), at the bottom of this post).
 
 # What is a BVH?
 
