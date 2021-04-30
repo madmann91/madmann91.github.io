@@ -126,10 +126,7 @@ struct Ray {
     float tmin, tmax;
 
     Vec3 inv_dir() const {
-        return Vec3(
-            safe_inverse(dir[0]),
-            safe_inverse(dir[1]),
-            safe_inverse(dir[2]));
+        return Vec3(safe_inverse(dir[0]), safe_inverse(dir[1]), safe_inverse(dir[2]));
     }
 };
 

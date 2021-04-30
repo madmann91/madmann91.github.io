@@ -174,7 +174,7 @@ That would be correct, if you were not enforcing any particular convention in ho
 However, with a little bit of thinking, we can reduce that to one index only.
 This is important because it leaves us space to encode the fact that the node is a leaf, without sacrificing any bit anywhere in our indices.
 
-There are at least to conventions that can help with that to my knowledge:
+There are at least two conventions that can help with that to my knowledge:
 
 - Placing children next to each other.
   You only then need to store the index of the first child, the second is given as that index plus one.
@@ -555,7 +555,7 @@ $$C_T + \frac{SA(L)}{SA(P)}\,C_I\,N(L) + \frac{SA(R)}{SA(P)}\,C_I\,N(R) > C_I N(
 
 We can reorganize that a bit to simplify the computation, and obtain:
 
-$$SA(L)\,N(L) + SA(R)\,N(R) > SA(P) (N(P) - \frac{C_T}{C_I})$$
+$$SA(L)\,N(L) + SA(R)\,N(R) > SA(P) \left(N(P) - \frac{C_T}{C_I}\right)$$
 
 The left hand side of this inequation is directly computed by `find_best_split()`, and the right hand side can be computed using the surface area of the bounding box of the current leaf being split, along with the number of primitives contained in it.
 In case the SAH tells us that the split is bad, but the leaf contains too many primitives, we fall back to a simple median split along the largest axis.
@@ -632,7 +632,7 @@ Nodes for which the ray do not intersect the bounding volume are discarded, and 
 The process is very similar when intersecting a BVH with a frustum, or when intersecting a BVH with another BVH.
 For simplicity, we are only going to describe the BVH-ray intersection case in this post.
 
-The algorithm starts by pushing the root node of the BVH on the stack, and then enters a loop, usually called _traversal loop_.
+The algorithm starts by pushing the root node of the BVH on the stack, and then enters a loop, usually called the _traversal loop_.
 In that loop, the algorithm performs the following steps:
 
 1. Pop a node from the stack,
@@ -642,7 +642,7 @@ In that loop, the algorithm performs the following steps:
 
 Of course, like mentioned previously, there are important optimizations that are omitted here, like the traversal order optimization, or octant-based intersection.
 If you are serious about this, I highly recommend implementing at least the traversal order optimization (again, see previous posts for that).
-For the moment, let us focus, on this simple form of the algorithm, without any optimization.
+For the moment, let us focus on this simple form of the algorithm, without any optimization.
 Here is some code that implements this algorithm:
 
 ```cpp
@@ -695,7 +695,8 @@ Hit Bvh::traverse(Ray& ray, const std::vector<Prim>& prims) const {
 ```
 
 This code is a direct translation of the 4 steps above, using `std::stack` for the stack, and encoding a `Hit` as an integer corresponding to a primitive index.
-However, it uses two functions that we have not defined yet: `intersect_primitive()` and `Node::intersect()`.
+However, it uses two functions that we have not defined yet: `Prim::intersect()` and `Node::intersect()`.
+We will first present the latter.
 
 ## Ray-Node Intersection
 
@@ -752,10 +753,7 @@ inline float safe_inverse(float x) {
 struct Ray {
     /* ... */
     Vec3 inv_dir() const {
-        return Vec3(
-            safe_inverse(dir[0]),
-            safe_inverse(dir[1]),
-            safe_inverse(dir[2]));
+        return Vec3(safe_inverse(dir[0]), safe_inverse(dir[1]), safe_inverse(dir[2]));
     }
 };
 
@@ -781,7 +779,8 @@ struct Node {
     
 For important numerical precision reasons that are out of the scope of this post, it is better to use the inverse ray direction, and to use the very same `robust_min()` and `robust_max()` functions instead of `std::min()` and `std::max()`.
 For more information on this please refer to the paper _Robust BVH Ray Traversal_, by T. Ize.
-Note that for performance, the inverse direction of the ray should be computed at the beginning of the traversal routine, which we do not do here (compilers _might_ be able to move that out of the loop but I have not checked whether that happens or not).
+Note that for performance, the inverse direction of the ray should be computed at the beginning of the traversal routine,
+which we do not do here (compilers _might_ be able to move that out of the loop, and indeed, gcc does that, but that might not be the case for all).
 
 ## Ray-Primitive intersection
 
