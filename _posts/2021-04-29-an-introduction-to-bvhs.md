@@ -858,6 +858,10 @@ The command to run the program is then:
 ./bvh cornell_box.obj
 ```
 
+You should get the following picture generated in the file "out.ppm":
+
+![Output of the Previous Command](/assets/bvh_cornell_box_out.png)
+
 # Conclusion
 
 This concludes this very long post on an introduction to BVHs, and by now you have hopefully gained enough knowledge to be able to apply the more advanced optimization techniques described in the [previous posts]({% link _posts/2020-12-28-bvhs-part-1.md %}).
