@@ -407,7 +407,7 @@ Consider an algorithm that would enumerate all possibilities.
 First, it would look at all the partitions which have one primitive in the one child, and everything else in the other:
 There are $$N\choose{1}$$ such partitions.
 Then, the algorithm would move on to partitions that have two primitives in one child, of which there are $$N\choose{2}$$, and so on.
-When one child has $$\left\lfloor\frac{N}{2}\right\rfloor - k$$ primitives, the other has $$\left\lfloor\frac{N}{2}\right\rfloor + k$$, so, by symmetry, the algorithm would have listed all primitives when it reaches $$\left\lfloor\frac{N}{2}\right\rfloor$$ primitive in one node, at which point it should stop.
+When one child has $$\left\lfloor\frac{N}{2}\right\rfloor - k$$ primitives, the other has $$\left\lfloor\frac{N}{2}\right\rfloor + k$$, so, by symmetry, the algorithm would have listed all primitives when it reaches $$\left\lfloor\frac{N}{2}\right\rfloor$$ primitives in one node, at which point it should stop.
 
 So, in total, the number of possible partitions is:
 
