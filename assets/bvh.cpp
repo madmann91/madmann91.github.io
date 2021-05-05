@@ -108,8 +108,8 @@ struct BBox {
 
     static BBox empty() {
         return BBox(
-            Vec3(-std::numeric_limits<float>::max()),
-            Vec3(+std::numeric_limits<float>::max()));
+            Vec3(+std::numeric_limits<float>::max()),
+            Vec3(-std::numeric_limits<float>::max()));
     }
 };
 
@@ -231,7 +231,7 @@ static Split find_best_split(
 {
     std::array<Bin, bin_count> bins;
     for (size_t i = 0; i < node.prim_count; ++i) {
-        auto prim_index = bvh.prim_indices[i];
+        auto prim_index = bvh.prim_indices[node.first_index + i];
         auto& bin = bins[bin_index(axis, node.bbox, centers[prim_index])];
         bin.bbox.extend(bboxes[prim_index]);
         bin.prim_count++;
@@ -240,14 +240,17 @@ static Split find_best_split(
     Bin left_accum, right_accum;
     for (size_t i = bin_count - 1; i > 0; --i) {
         right_accum.extend(bins[i]);
+        // Due to the definition of an empty bounding box, the cost of an empty bin is -NaN
         right_cost[i] = right_accum.cost();
     }
     Split split { axis };
     for (size_t i = 0; i < bin_count - 1; ++i) {
         left_accum.extend(bins[i]);
         float cost = left_accum.cost() + right_cost[i + 1];
+        // This test is defined such that NaNs are automatically ignored.
+        // Thus, only valid combinations with non-empty bins are considered.
         if (cost < split.cost) {
-            split.cost  = cost;
+            split.cost = cost;
             split.right_bin = i + 1;
         }
     }
@@ -266,9 +269,9 @@ static void build_recursive(
 
     node.bbox = BBox::empty();
     for (size_t i = 0; i < node.prim_count; ++i)
-        node.bbox.extend(bboxes[bvh.prim_indices[i]]);
+        node.bbox.extend(bboxes[bvh.prim_indices[node.first_index + i]]);
 
-    if (node.prim_count < build_config.min_prims)
+    if (node.prim_count <= build_config.min_prims)
         return;
 
     Split min_split;
@@ -277,7 +280,7 @@ static void build_recursive(
 
     float leaf_cost = node.bbox.half_area() * (node.prim_count - build_config.traversal_cost);
     size_t first_right; // Index of the first primitive in the right child
-    if (!min_split || min_split.cost > leaf_cost) {
+    if (!min_split || min_split.cost >= leaf_cost) {
         if (node.prim_count > build_config.max_prims) {
             // Fall back solution: The node has too many primitives, we use the median split
             int axis = node.bbox.largest_axis();

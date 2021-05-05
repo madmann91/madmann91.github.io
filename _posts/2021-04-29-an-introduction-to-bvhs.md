@@ -129,8 +129,8 @@ struct BBox {
 
     static BBox empty() {
         return BBox(
-            Vec3(-std::numeric_limits<float>::max()),
-            Vec3(+std::numeric_limits<float>::max()));
+            Vec3(+std::numeric_limits<float>::max()),
+            Vec3(-std::numeric_limits<float>::max()));
     }
 };
 ```
@@ -323,7 +323,7 @@ static void build_recursive(
 
     node.bbox = BBox::empty();
     for (size_t i = 0; i < node.prim_count; ++i)
-        node.bbox.extend(bboxes[bvh.prim_indices[i]]);
+        node.bbox.extend(bboxes[bvh.prim_indices[node.first_index + i]]);
 
     /* ... */
 }
@@ -348,7 +348,7 @@ static constexpr BuildConfig build_config = { 2, 8, 1.0f };
 
 static void build_recursive(/* ... */) {
     /* ... */
-    if (node.prim_count < build_config.min_prims)
+    if (node.prim_count <= build_config.min_prims)
         return;
     /* ... */
 }
@@ -506,7 +506,7 @@ static Split find_best_split(
 {
     std::array<Bin, bin_count> bins;
     for (size_t i = 0; i < node.prim_count; ++i) {
-        auto prim_index = bvh.prim_indices[i];
+        auto prim_index = bvh.prim_indices[node.first_index + i];
         auto& bin = bins[bin_index(axis, node.bbox, centers[prim_index])];
         bin.bbox.extend(bboxes[prim_index]);
         bin.prim_count++;
@@ -515,14 +515,17 @@ static Split find_best_split(
     Bin left_accum, right_accum;
     for (size_t i = bin_count - 1; i > 0; --i) {
         right_accum.extend(bins[i]);
+        // Due to the definition of an empty bounding box, the cost of an empty bin is -NaN
         right_cost[i] = right_accum.cost();
     }
     Split split { axis };
     for (size_t i = 0; i < bin_count - 1; ++i) {
         left_accum.extend(bins[i]);
         float cost = left_accum.cost() + right_cost[i + 1];
+        // This test is defined such that NaNs are automatically ignored.
+        // Thus, only valid combinations with non-empty bins are considered.
         if (cost < split.cost) {
-            split.cost  = cost;
+            split.cost = cost;
             split.right_bin = i + 1;
         }
     }
@@ -531,6 +534,12 @@ static Split find_best_split(
 ```
 
 Note that we use the half area, and not the area, since it saves a multiplication by 2.
+Empty bounding bins have a cost equal to `-NaN`, since the half area of an empty bounding box is `-inf`,
+and because the cost is the half area multiplied by the number of primitives (which is 0 in this case).
+Consequently, we have designed the comparison `cost < split.cost` to skip combinations that yield a cost that is not a number.
+The IEEE-754 standard guarantees that a comparison which involves a `NaN` value evaluates to `false`.
+For this to work, _do not compile in `-ffast-math`_.
+In general, please do not enable `-ffast-math`, unless you know what you are doing (and even in that case, only enable it per-file, where it is needed, not project-wide).
 Now, we can use this code to find a good split in the recursive construction procedure:
 
 ```cpp
@@ -566,7 +575,7 @@ static void build_recursive(/* ... */) {
     /* ... */
     float leaf_cost = node.bbox.half_area() * (node.prim_count - build_config.traversal_cost);
     size_t first_right; // Index of the first primitive in the right child
-    if (!min_split || min_split.cost > leaf_cost) {
+    if (!min_split || min_split.cost >= leaf_cost) {
         if (node.prim_count > build_config.max_prims) {
             // Fall back solution: The node has too many primitives, we use the median split
             int axis = node.bbox.largest_axis();
