@@ -64,10 +64,10 @@ With this simple piece of code, a call to `Morton::encode(x, y, z)` encodes thre
 The order defined by Morton codes is such that cells that are next to each other on the grid produce (reasonably) close morton codes.
 Thus, if we sort primitives by morton codes, a local search should be enough to determine good merging candidates.
 
-Sorting primitives by morton codes is pretty easy, using `std::sort` from standard library.
+Sorting primitives by morton codes is pretty easy, using `std::sort` from the standard library.
 The only real question is how to place primitives on a grid.
-The solution to that is also not really complicated, the only thing that is required is to compute the bounding box of all the centers (the bounding box of the primitives could also do, but the bounding box of the centers is obviously tighter), and then use divide that into a 1024x1024x1024 grid.
-The code that does all that, including sorting is listed below:
+The solution to that is also not really complicated: The only thing that is required is to compute the bounding box of all the centers (the bounding box of the primitives could also do, but it would not be as tight), and then divide that into a 1024x1024x1024 cells to form a grid.
+The code that does all that, including sorting, is listed below:
 
 ```cpp
 Bvh Bvh::build(const BBox* bboxes, const Vec3* centers, size_t prim_count) {
@@ -120,7 +120,7 @@ Bvh Bvh::build(const BBox* bboxes, const Vec3* centers, size_t prim_count) {
 }
 ```
 
-It is important to use `bboxes[bvh.prim_indices[i]]`, as it ensures that the leaves cover the right primitives and are placed in the same order as the _sorted primitives_.
+It is important to use `bboxes[bvh.prim_indices[i]]`, as it ensures that the leaves are placed in the same order as the _sorted primitives_.
 We also allocate another array of nodes called `next_nodes`, whose purpose will become obvious in the next section.
 
 # Merging from the Bottom Up
@@ -136,6 +136,7 @@ Inside one merging iteration, the process is as follows:
 2. For all nodes (at index `i`) that have a merge candidate at index `j == merge_index[i]` for which the merge candidate of `j` is `i`,
    we create a parent for the two nodes and place it in the array of nodes of the next iteration (`next_nodes`).
    The two nodes at indices `i` and `j` are then placed in the final set of nodes, and are never considered again for merging.
+   This is intuitively justified by the fact that we merge nodes that "agree" on their merge candidates.
 
 ## Local Search
 
@@ -240,6 +241,6 @@ I have already written something about that [earlier]({% link _posts/2020-12-28-
 
 # Conclusion
 
-PLOC is also a simple BVH construction method that is easy to implement in a sequential manner.
+PLOC, just like binning, is a simple BVH construction method that is easy to implement in a sequential manner.
 As noted in this post, additional improvements are required if the best performance is desired, such as using radix sort and parallelizing each step of the algorithm for construction speed, or running an additional leaf collapsing pass for traversal speed.
 In any case, this should serve as a decent introduction to PLOC and the code given here can be used as a reference implementation when adding the optimizations described in my [previous blog posts]({% link _posts/2020-12-28-bvhs-part-1.md %}).
