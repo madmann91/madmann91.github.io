@@ -149,7 +149,7 @@ From reading the source code of other people's implementations, this is too ofte
 # Building a BVH
 
 Now that the basics are covered, we can start to explain how to build a BVH, step by step.
-The algorithm we are going to use is explained in _On fast Construction of SAH-based Bounding Volume Hierarchies_, by I. Wald.
+The algorithm we are going to use is explained in _On Fast Construction of SAH-based Bounding Volume Hierarchies_, by I. Wald.
 This algorithm operates from the top to the bottom, and tries to build good trees by approximating a cost function for BVHs, called the Surface Area Heuristic (SAH).
 Approximation is done by placing primitives in _bins_, which is why this algorithm is often referred to as _binning_ BVH construction.
 It is a decent building algorithm that has some great properties: It produces decent trees, it is relatively fast, and finally, it is easy to implement.
