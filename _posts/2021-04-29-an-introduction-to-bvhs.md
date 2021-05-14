@@ -377,7 +377,7 @@ The function $$N(P)$$ represents the number of primitives in the _leaf_ $$P$$.
 Finally, the constants $$C_T$$ and $$C_I$$ represent the cost of traversing a node, and the cost of intersecting a ray with a primitive, respectively.
 
 The reason for the use of the surface area of the bounding box is that the ratio of the area of the child divided by the area of the parent bounding box represents the probability of hitting the child, conditioned to having hit the parent (with the assumptions that were made above---no occlusion, rays start from outside the scene, and are uniformly distributed).
-Thus, the SAH weights the cost of the left and right child by the probability of hitting them, which should make sense intuitevely.
+Thus, the SAH weights the cost of the left and right child by the probability of hitting them, which should make sense intuitively.
 It also should be pretty obvious that the larger the bounding box of the node is, the larger the chance that our ray
 node intersection routine will return an intersection.
 
