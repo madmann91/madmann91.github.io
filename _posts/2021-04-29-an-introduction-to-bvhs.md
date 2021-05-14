@@ -580,9 +580,9 @@ static void build_recursive(/* ... */) {
             // Fall back solution: The node has too many primitives, we use the median split
             int axis = node.bbox.largest_axis();
             std::sort(
-                    bvh.prim_indices.begin() + node.first_index,
-                    bvh.prim_indices.begin() + node.first_index + node.prim_count,
-                    [&] (size_t i, size_t j) { return centers[i][axis] < centers[j][axis]; });
+                bvh.prim_indices.begin() + node.first_index,
+                bvh.prim_indices.begin() + node.first_index + node.prim_count,
+                [&] (size_t i, size_t j) { return centers[i][axis] < centers[j][axis]; });
             first_right = node.first_index + node.prim_count / 2;
         } else
             // Terminate with a leaf
@@ -590,9 +590,9 @@ static void build_recursive(/* ... */) {
     } else {
         // The split was good, we need to partition the primitives
         first_right = std::partition(
-                bvh.prim_indices.begin() + node.first_index,
-                bvh.prim_indices.begin() + node.first_index + node.prim_count,
-                [&] (size_t i) { return bin_index(min_split.axis, node.bbox, centers[i]) < min_split.right_bin; })
+            bvh.prim_indices.begin() + node.first_index,
+            bvh.prim_indices.begin() + node.first_index + node.prim_count,
+            [&] (size_t i) { return bin_index(min_split.axis, node.bbox, centers[i]) < min_split.right_bin; })
             - bvh.prim_indices.begin();
     }
     /* ... */
