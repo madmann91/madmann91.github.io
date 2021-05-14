@@ -534,7 +534,7 @@ static Split find_best_split(
 ```
 
 Note that we use the half area, and not the area, since it saves a multiplication by 2.
-Empty bounding bins have a cost equal to `-NaN`, since the half area of an empty bounding box is `-inf`,
+Empty bins have a cost equal to `-NaN`, since the half area of an empty bounding box is `-inf`,
 and because the cost is the half area multiplied by the number of primitives (which is 0 in this case).
 Consequently, we have designed the comparison `cost < split.cost` to skip combinations that yield a cost that is not a number.
 The IEEE-754 standard guarantees that a comparison which involves a `NaN` value evaluates to `false`.
