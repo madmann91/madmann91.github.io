@@ -286,7 +286,7 @@ This results in:
 At this point, everything is correctly wired.
 Note that item 2. is perhaps the most difficult to take care of in a setting where scoping is explicit, as it requires to determine the dependencies of instructions on the parameter of `ret_id`.
 When using a graph-based IR, this problem does not manifest itself at this point, since there is no need to take care of instruction ordering.
-The only downside of using a graph-based IR would be that perhaps the scheduling of instructions has to happen at another point, but there are algorithms for this (see e.g. C. Click's "Global Value Numbering -- Global Code Motion" article).
+The only downside of using a graph-based IR would be that perhaps the scheduling of instructions has to happen at another point, but there are algorithms for this (see e.g. C. Click's _Global Value Numbering -- Global Code Motion_ article).
 
 The `callc` instruction and mechanism is essentially allowing the use of a direct-style functions in an otherwise CPS IR.
 In a way, some might argue that this is the same as having two different representations for basic-blocks and functions (since they take this extra `callc` instruction out of nowhere),
