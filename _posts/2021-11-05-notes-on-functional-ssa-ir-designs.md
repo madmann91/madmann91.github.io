@@ -72,7 +72,7 @@ To solve this problem, a _phi-node_ is placed where uses of `x` appear after the
     ... phi(x2, x3) ...
 
 Intuitively, `phi(x2, x3)` means "the value of this expression is either `x2` or `x3`,
-depending on the control-flow path leading to the current instruction.
+depending on the control-flow path leading to the current instruction".
 
 In standard SSA-based IRs, functions are represented as a list of _basic-blocks_,
 which are just groups of instructions that start at a label,
