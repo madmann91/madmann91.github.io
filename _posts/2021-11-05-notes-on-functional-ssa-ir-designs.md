@@ -138,8 +138,7 @@ Therefore, the code seen above can be translated in a functional-SSA form like t
 
 An important aspect of this example is that the order in which the basic-blocks appear is reversed:
 `if_join` has to appear first since it is needed by other basic-blocks before it.
-This can be changed by using recursive `let` bindings instead of non-recursive ones like here.
-But importantly, the order in which the names appear here outline another important property of SSA-based IRs: Scoping.
+The order in which the names appear here outlines another important property of SSA-based IRs: Scoping.
 
 Scoping, in traditional SSA-based IRs, is represented _implicitly_.
 It is assumed that definitions _dominate_ all their uses, and it is an error if they do not.
