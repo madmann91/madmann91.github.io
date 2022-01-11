@@ -201,7 +201,7 @@ First of all, arithmetic instructions and primitive operations in general can be
 For instance, just have the addition be an instruction that takes two operands and produces a result, as in pretty much all traditional IRs.
 
 However, for function calls, this is a bit tricky, because if functions are represented in direct-style, then they produce a value.
-Thus, their function body must have the type of the value that is produced (a function returning an integer should produce have an integer value as a body).
+Thus, their function body must have the type of the value that is produced (a function returning an integer should have an integer value as a body).
 This prevents calling the first basic-block of the function, because calling it would result in a value of the special "no-return" type.
 Still, within a function, we would like to have control-flow constructs, and thus we need a way to "initiate" the first CPS call.
 The way I represent that is through a special `callc` instruction that produces a value, and transfers control to the called basic-block.
