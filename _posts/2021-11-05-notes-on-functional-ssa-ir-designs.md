@@ -150,7 +150,7 @@ Recall the definitions of the dominance relation for instructions and basic-bloc
 
 While these definitions may seem daunting at first, they just formalize the intuition that, in SSA, a use of an instruction (as an operand of another) must have a value for the instruction,
 which requires that which ever control-flow path was taken, the instruction used as operand was executed before the use itself.
-The following program, for instance, is ill-formed, because `x2` is used in `if_join` and there is a control-flow path from the entry block to `if_join` which does not initialize `x2`:
+The following program, for instance, is ill-formed, because `x1` is used in `if_join` and there is a control-flow path from the entry block to `if_join` which does not initialize `x1`:
 
         branch cond, if_true, if_join
     if_true:
