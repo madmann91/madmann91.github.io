@@ -193,8 +193,10 @@ struct Morton {
     static constexpr size_t grid_dim = 1024;
 
     static Value split(Value x) {
-        uint64_t mask = (UINT64_C(1) << (1 << log_bits)) - 1;
-        for (int i = log_bits, n = 1 << log_bits; i > 0; --i, n >>= 1) {
+        const int bit_count = 1 << log_bits;
+        Value mask = (static_cast<Value>(-1)) >> (bit_count / 2);
+        x &= mask;
+        for (int i = log_bits - 1, n = 1 << i; i > 0; --i, n >>= 1) {
             mask = (mask | (mask << n)) & ~(mask << (n / 2));
             x = (x | (x << n)) & mask;
         }
