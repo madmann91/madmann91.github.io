@@ -3,10 +3,8 @@ layout: post
 title: "Notes on Functional SSA IR Designs"
 usemathjax: true
 tags:
-    - bvh
-    - ray tracing
-    - computer graphics
-    - parallel computing
+    - compiler design
+    - intermediate representation
     - optimization
 ---
 
