@@ -416,7 +416,7 @@ alias HasFur  = [ fur_color: Color ];
 // `Cat`. Also, note the use of `&` for record concatenation: `Animal + HasFur` is the same as
 // the type `[age: u32, fur_color: Color]`.
 subtype Cat  = Animal & HasFur; 
-subtype Dog  = Animal & HasFur + CanSwim;
+subtype Dog  = Animal & HasFur & CanSwim;
 subtype Frog = Animal & CanSwim;
 
 alias AnyAnimal = Cat | Dog | Frog;
