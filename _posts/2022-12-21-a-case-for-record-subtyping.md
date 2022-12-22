@@ -385,7 +385,7 @@ struct Animal {
     data: AnimalData
 }
 enum AnimalData {
-    Cat { age: u32, fur_color: Color },
+    Cat { /* age: u32 is no longer needed */, fur_color: Color },
     ...
 }
 ```
@@ -413,7 +413,7 @@ alias HasFur  = [ fur_color: Color ];
 //   subtype T = U;
 // creates a nominal type T that can be implicitly converted to U, but not the other way around.
 // This means that a `Cat` can be converted to an `Animal`, but an `Animal` cannot be converted to a
-// `Cat`. Also, note the use of `&` for record concatenation: `Animal + HasFur` is the same as
+// `Cat`. Also, note the use of `&` for record concatenation: `Animal & HasFur` is the same as
 // the type `[age: u32, fur_color: Color]`.
 subtype Cat  = Animal & HasFur; 
 subtype Dog  = Animal & HasFur & CanSwim;
