@@ -13,4 +13,5 @@ permalink: /about/
 >        -- All The Madmen, David Bowie
 
 I am Arsène Pérard-Gayot, and this is my personal website, where you find posts on various subjects,
-such as Computer Graphics, Programming Language Design, or Compilers.
+such as Computer Graphics, Programming Language Design, or Compilers. Opinions are mine, not necessarily
+those of the company I work for.
