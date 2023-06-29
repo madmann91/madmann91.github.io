@@ -52,7 +52,7 @@ Structural records are records that are identified by their _structure_: The fie
 types determine if two record types compare equal. There are different ways to compare the fields:
 One can assume that order matters, or one can compare fields regardless of their order. Both options
 are valid, but the latter one is more expressive. We will assume that fields are compared regardless
-of their order in the remaining of the post.
+of their order in the rest of this post.
 
 As an example, consider a hypothetical language syntax using `[l1: T1, ..., ln: Tn]` for a record
 _type_ with field labels `l1`, ..., `ln` and respective field types `T1`, ..., `Tn`. Similarly,
