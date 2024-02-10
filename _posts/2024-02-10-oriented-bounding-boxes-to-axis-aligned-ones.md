@@ -17,15 +17,15 @@ their volume, to provide collision proxies, to speed-up ray-tracing queries, to 
 data structures, or in any application that needs to work with a simplified model for the enclosed
 object.
 
-In that context, bounding boxes are either *axis-aligned* or *oriented*. Axis-aligned bounding
-boxes (AABBs), as their name suggest, are tied to the axes in which the world is defined. This means that
-they do not necessarily bound the object they enclose tightly. Oriented bounding boxes (OBBs), on
-the contrary, contain their own transformation, relative to the world in which they are defined.
-This allows OBBs to bound their contents more tightly than AABBs.
+In that context, bounding boxes are either *axis-aligned* or *oriented*. Axis-aligned bounding boxes
+(AABBs), as their name suggest, are tied to the axes in which the world is defined. Oriented
+bounding boxes (OBBs), on the contrary, contain their own transformation, relative to the world in
+which they are defined. This allows OBBs to bound their contents more tightly than AABBs.
 
 ![AABB vs. OBB](/assets/aabb_vs_obb.svg)
 
-In mathematical terms, a 3D AABB is the set defined by:
+In mathematical terms, a 3D AABB with minimum coordinate vector $$min$$ and maximum coordinate
+vector $$max$$ is the set defined by:
 
 $$AABB(min, max) = \left\{ v \in \mathcal{R}^3 \,\mid\,
     v_x \in [min_x, max_x],
@@ -33,7 +33,7 @@ $$AABB(min, max) = \left\{ v \in \mathcal{R}^3 \,\mid\,
     v_z \in [min_z, max_z]
 \right\}$$
 
-An 3D OBB, on the other hand, is defined by:
+A 3D OBB with center point $$c$$ and with axes represented by a matrix $$M$$, is defined by:
 
 $$OBB(M, c) = \left\{ M\,v + c \,\mid\,
     v_x \in [-1, 1],
