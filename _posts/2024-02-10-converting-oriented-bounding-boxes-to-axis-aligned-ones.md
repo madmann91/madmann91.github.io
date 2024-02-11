@@ -69,7 +69,7 @@ minimum of each corner along every coordinate. This is for instance
 [the method](https://pbr-book.org/4ed/Geometry_and_Transformations/Applying_Transformations#BoundingBoxes)
 used in PBRT, the excellent reference book for offline rendering written by M. Pharr, W. Jakob, and
 G. Humphreys. There is however a more efficient way of doing this based that I have encountered in
-various places, including the _Bullet_ physics engine code base.
+various places[^1][^2], including the _Bullet_ physics engine code base.
 
 # The Method
 
@@ -221,3 +221,7 @@ may be simplified a little if the scale is incorporated in the matrix, as this o
 perform a matrix multiplication with vectors of the form $$(\pm 1, \pm 1, \pm 1)$$ (in which case
 scalar multiplications are no longer necessary), but generally will not beat the method described
 here.
+
+[^1]: J. Arvo presents a similar method in _Graphics Gems_ (1990) that uses min/max operations and contains branches and loops, but is otherwise pretty similar in spirit.
+
+[^2]: [Here](https://zeux.io/2010/10/17/aabb-from-obb-with-component-wise-abs/) is another source which implements this exact method, in the context of transforming an AABB into another AABB directly.
