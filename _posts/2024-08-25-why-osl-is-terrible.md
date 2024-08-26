@@ -11,7 +11,7 @@ tags:
 
 Lately, I have been working on [NOSL](https://github.com/madmann91/nosl/tree/master), an alternative
 [OSL](https://github.com/AcademySoftwareFoundation/OpenShadingLanguage/tree/main) compiler,
-in its early stages at the time of writing this post. 
+in its early stages at the time of writing this post.
 
 At work, and now while developing this new compiler, I have encountered many issues with OSL as a
 language, with its specification, and with its implementation. So, as a result of my growing
@@ -43,7 +43,7 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
 - Vector, points, normals, colors are "different" types, but can be assigned to each other without
   any issue. This makes one wonder why one needs those types to begin with.
-  
+
 - There are no enumeration types in OSL. Instead, shaders typically use strings to represent enumeration
   values. In OSL, strings are uniquely hashed, which allows representing them with an integer. This
   makes using strings as enumeration values more efficient, but also means that strings must be hashed
@@ -71,7 +71,7 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   if ("abcd") { // Legal!
   }
   ```
-   
+
   While also making code like this illegal:
 
   ```cpp
@@ -88,7 +88,6 @@ time passes, as I know I am bound to find new issues as I progress with my own r
       j = 3;
       printf("%d\n", i);
   }
-  
   void g() {
       int i = 1;
       f(i, i); // Prints 1 and 3!
@@ -108,12 +107,12 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   > The operators +, -, *, /, and the unary - (negation) may be used on most of the numeric types.
   > For multicomponent types (color, point, vector, normal, matrix), these
   > operators combine their arguments on a component-by-component basis.
-  
+
   This seems to say that addition works on a component-by-component basis for matrices. However, one
   also finds the following text later in the specification:
-  
+
   > The only operators that may be applied to the matrix type are * and /
-  
+
   So which one is it? Is matrix addition supported or not? The OSL implementation does not support it.
 
 - In the OSL specification, operator precedence is not indicated for every operator, and cannot be
@@ -121,7 +120,7 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   missing. Additionally, whenever operator precedence is mentioned, it is in the form of a table
   listing the operations that are valid on a given type. That makes no sense, since precedence is a
   parsing property, and no types are available at parsing time.
-  
+
 - Compound expressions are not well defined in the OSL specification. First, the grammar specifies
   that compound initializers are expressions and can thus appear everywhere, but in the
   implementation, compound initializers can only appear in function arguments or variable/parameter
@@ -142,7 +141,7 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   What's more, in the implementation, the compound initializer syntax is actually a synonym for a
   constructor expression:
-  
+
   ```cpp
   color c = { "rgb", 1, 1, 1 }; // Accepted by the implementation!
   ```
@@ -161,23 +160,62 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   Note how there is no clear explanation that describes how two functions containing a mix of
   arguments that match exactly and arguments that need coercions should be ranked, and how there is
-  no mention of which behavior to adopt in case of ambiguity. Quick tests of the implementation show
-  that it is _not_ following the overloading behavior of C++ (which expects the selected candidate to
-  be _strictly_ better than all the others).
+  no mention of which behavior to adopt in case of ambiguity. This means that it is up to the user
+  to figure out, via trial and error, which one of these functions get chosen for the call site
+  in `foo`:
+
+  ```cpp
+  void bar(int i, vector v) {}
+  void bar(color c, float f) {}
+  void bar(point p, normal n) {}
+  shader foo() {
+      bar(1, 1);
+  }
+  ```
+
+  Quick tests of the implementation show that it is _not_ following the overloading behavior of C++
+  (which expects the selected candidate to be _strictly_ better than all the others).
 
 # The implementation is a mess
 
 - In the OSL implementation, function call arguments corresponding to output function parameters can
-  be anything, including constants. The specification does not say what happens in that case:
+  be constants, sometimes. The specification does not say what happens in that case:
 
   > Function parameters in Open Shading Language are all passed by reference, and are read-only within
   > the body of the function unless they are also designated as output (in the same manner as output
   > shader parameters).
-  
+
   ```cpp
   void f(output float x) { x = 2; }
-  void g() { f(1); } // Accepted by the OSL implementation!
+  void g() { f(1); } // Accepted by the OSL implementation if 'g' is unused!
   ```
+
+  Interestingly, the following code passes, even if the function containing the error is used:
+
+  ```cpp
+  void f(output vector v) { v = 2; }
+  void g(float x) { f(vector(x, 1, 2)); } // Accepted by the OSL implementation!
+  shader foo() { g(1); }
+  ```
+
+  However, passing a vector full of constants does not work, again:
+
+  ```cpp
+  void f(output vector v) { v = 2; }
+  void g() { f(vector(1, 2, 3)); } // Rejected: "Attempted to write to a constant value"
+  shader foo() { g(); }
+  ```
+
+  Toying around with similar cases, it becomes possible to get broken code to pass, or to be rejected,
+  with different error messages. The following code even generates an invalid error message:
+
+  ```cpp
+  void baz(output vector v) { v = 1; }
+  shader foo() { baz(1); } // Rejected: "Cannot pass 'int $const1' as argument 1 to baz because it is an output parameter that must be a %s"
+  ```
+
+  This is most likely caused by the low-quality of the code in the type-checker, which leads to having
+  multiple code paths to handle mutability checks, each with their own set of bugs.
 
 - In the OSL implementation, the increment and decrement operators are allowed on every type. For
   instance, the implementation will accept incrementing a string. Beyond that, there is no way (in
@@ -200,7 +238,6 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   vector __operator__add__(vector x, vector y) {
       return x;
   }
-  
   shader foo() {
       vector x = vector(1) + vector(2);
   }
