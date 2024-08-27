@@ -190,10 +190,10 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   ```cpp
   float f() {
-    return u;
+      return u;
   }
   shader foo() {
-    printf("%f\n", f());
+      printf("%f\n", f());
   }
   ```
 
@@ -244,7 +244,7 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   ```cpp
   shader foo() {
-    float u = 1; // Rejected: ""u" already declared in this scope"
+      float u = 1; // Rejected: ""u" already declared in this scope"
   }
   ```
 
@@ -253,16 +253,18 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   ```cpp
   void f() {
-    float u = v; // Accepted without a warning. Note how the initializer 'v' is itself a global variable.
+      float u = v; // Accepted without a warning. Note how the initializer 'v' is itself a global variable.
   }
   ```
 
   This strange behavior can also be worked around by adding another layer of braces around a shader:
 
   ```cpp
-  shader foo() {{
-    float u = 1; // Accepted by the implementation!
-  }}
+  shader foo() {
+      {
+          float u = 1; // Accepted by the implementation!
+      }
+  }
   ```
 
 - In the OSL implementation, the increment and decrement operators are allowed on every type. For
