@@ -176,6 +176,27 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   Quick tests of the implementation show that it is _not_ following the overloading behavior of C++
   (which expects the selected candidate to be _strictly_ better than all the others).
 
+- The specification says this regarding global variables:
+
+  > Global variables (sometimes called graphics state variables) contain the basic information that
+  > the renderer knows about the point being shaded, such as position, surface orientation, and
+  > default surface color. You need not declare these variables; they are simply available by default
+  > in your shader.
+
+  Note the usual vagueness about where these variables are available: It does say that they are
+  available in "the shader", but that could either mean within a `shader`, `surface`, `volume` or
+  `displacement` function only, or within the entire shader _file_. The implementation does in fact
+  allow accessing global variables from a function:
+
+  ```cpp
+  float f() {
+    return u;
+  }
+  shader foo() {
+    printf("%f\n", f());
+  }
+  ```
+
 # The implementation is a mess
 
 - In the OSL implementation, function call arguments corresponding to output function parameters can
@@ -216,6 +237,33 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
   This is most likely caused by the low-quality of the code in the type-checker, which leads to having
   multiple code paths to handle mutability checks, each with their own set of bugs.
+
+- The OSL implementation considers that global variables are not, in fact, global: It will refuse to
+  shadow them from within a shader, as if they were declared locally inside the shader. Take the
+  following snippet as an example:
+
+  ```cpp
+  shader foo() {
+    float u = 1; // Rejected: ""u" already declared in this scope"
+  }
+  ```
+
+  However, further testing reveals that individual functions can access global variables, and that
+  it is possible to shadow those global variables from within a function without an issue:
+
+  ```cpp
+  void f() {
+    float u = v; // Accepted without a warning. Note how the initializer 'v' is itself a global variable.
+  }
+  ```
+
+  This strange behavior can also be worked around by adding another layer of braces around a shader:
+
+  ```cpp
+  shader foo() {{
+    float u = 1; // Accepted by the implementation!
+  }}
+  ```
 
 - In the OSL implementation, the increment and decrement operators are allowed on every type. For
   instance, the implementation will accept incrementing a string. Beyond that, there is no way (in
