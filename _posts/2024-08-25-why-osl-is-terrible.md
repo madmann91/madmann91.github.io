@@ -317,6 +317,18 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   }
   ```
 
+- The implementation does not support the first variant of `spline` as defined in the specification:
+
+  >     type spline (string basis, float x, type y0 , type y1 , ... type yn-1)
+  >     type spline (string basis, float x, type y[])
+  >     type spline (string basis, float x, int nknots, type y[])
+
+  ```cpp
+  shader foo() {
+      vector value = spline("bezier", 0.5, vector(1), vector(2)); // Rejected by the implementation
+  }
+  ```
+
 # Conclusion
 
 OSL is not a good language, nor a good _shading language_. Its implementation is amazingly poor,
