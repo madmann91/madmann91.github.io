@@ -20,6 +20,8 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
 # The language is not well-designed
 
+To begin with, the language itself has many flaws, of which I have collected a few below:
+
 - No boolean type exists in OSL, and integers are used instead. This harms readability of the shader
   source, as well as the performance of the resulting code (because 32-bit integers are used where
   1-bit, or perhaps 1-byte ones would have been enough). To add insult to injury, the language
@@ -55,7 +57,9 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   to date.
 
 - OSL has no matrix addition/subtraction, for no particular reason. Matrix addition or subtraction is
-  not a complicated operation, nor an uncommon one.
+  not a complicated operation, nor an uncommon one. As a result, users will end up re-implementing matrix
+  addition, which is a shame because that really should have been part of a standard type dedicated
+  to matrices.
 
 - Some questionable conversions to integers are allowed. Those also only work in the context of
   logical expressions, if statements, and loop conditions:
@@ -78,15 +82,27 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   int j = (int)"abcd";
   ```
 
+  While the latter is quite rightfully rejected, there is not much of a different between that
+  expression and the former `1 && "abcd"`.
+
 - OSL has dedicated a `normal` type for normals, but the built-in function `calculatenormal`
-  returns a `vector` instead.
+  returns a `vector` instead. I do not think I need to add anything here.
 
 - OSL has a very weak type system, in which it is impossible to encode constraints such as "the
   inputs to this function can be anything as long as it is an array". This leads to very convoluted
   descriptions for builtin functions such as `gettextureinfo` (for which the output parameter
   `destination` can apparently be anything), but also to a very awkward implementation that uses
   strings such as `"?[]"` to encode the previous constraint, instead of properly implementing this
-  as part of the type system.
+  as part of the type system. It is as if the language was designed while carefully avoiding
+  type-system design at all cost.
+
+- For some built-in functions calls, the specification just adds implicit conversions that normally are
+  not allowed in regular OSL code. This means that the type-system is essentially bypassed, or at
+  least behaves wildly differently in the call sites for these built-in function calls. Needless to
+  say, that is not good design because that is not just utterly confusing but also very error prone.
+  Initially, the user will most likely not be aware that a `float` can be automatically promoted to
+  a `float[2]` in the context of `getattribute`, and if exposed to that behavior, will expect such
+  conversions to happen in other places too, which is guaranteed to cause confusion.
 
 - Arguments are passed by reference, always. This prevents cross-module pointer provenance/aliasing
   analysis, and as a result produces slower code. Additionally, this also produces potentially
@@ -110,7 +126,15 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   reads and writes, and global variable accesses. Moreover, this also means that any compiler analysis
   has to do the same, which complicates cross-module analysis.
 
+While OSL can be praised for having a specification at all, it is a rather low bar to clear,
+particularly when the specification itself is full of holes, contradicts itself, and leaves out
+essential bits of information.
+
 # The specification is very poorly written
+
+OSL has a specification, and unfortunately, it does not always help much clearing out the meaning of
+specific syntactic constructs. Part of it is due to OSL being a poorly-designed language, but part of
+it is due to the specification itself being poorly written:
 
 - The OSL specification is confusing and often contradicts itself. For instance:
 
@@ -207,7 +231,14 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   }
   ```
 
+For explanations or special cases that are not explained by the specification, one may think that it
+suffices to use the implementation to see how it behaves in those cases. However, that is foolish
+thinking, as we are going to discuss next.
+
 # The implementation is a mess
+
+The OSL implementation generally cannot be relied upon. More particularly, here are a select few
+issues that I have personally encountered with it:
 
 - In the OSL implementation, function call arguments corresponding to output function parameters can
   be constants, sometimes. The specification does not say what happens in that case:
