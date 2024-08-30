@@ -81,6 +81,13 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 - OSL has dedicated a `normal` type for normals, but the built-in function `calculatenormal`
   returns a `vector` instead.
 
+- OSL has a very weak type system, in which it is impossible to encode constraints such as "the
+  inputs to this function can be anything as long as it is an array". This leads to very convoluted
+  descriptions for builtin functions such as `gettextureinfo` (for which the output parameter
+  `destination` can apparently be anything), but also to a very awkward implementation that uses
+  strings such as `"?[]"` to encode the previous constraint, instead of properly implementing this
+  as part of the type system.
+
 - Arguments are passed by reference, always. This prevents cross-module pointer provenance/aliasing
   analysis, and as a result produces slower code. Additionally, this also produces potentially
   surprising behavior at runtime:
