@@ -89,12 +89,12 @@ To begin with, the language itself has many flaws, of which I have collected a f
   returns a `vector` instead. I do not think I need to add anything here.
 
 - OSL has a very weak type system, in which it is impossible to encode constraints such as "the
-  inputs to this function can be anything as long as it is an array". This leads to very convoluted
-  descriptions for builtin functions such as `gettextureinfo` (for which the output parameter
-  `destination` can apparently be anything), but also to a very awkward implementation that uses
-  strings such as `"?[]"` to encode the previous constraint, instead of properly implementing this
-  as part of the type system. It is as if the language was designed while carefully avoiding
-  type-system design at all cost.
+  inputs to this function can be anything as long as it is an array". In the specification, this
+  leads to very convoluted descriptions for builtin functions such as `gettextureinfo` (for which
+  the output parameter `destination` can apparently be anything), but also to a very awkward
+  implementation that uses strings such as `"?[]"` to encode the previous constraint, instead of
+  properly implementing this as part of the type system. It is as if the language was designed while
+  carefully avoiding type-system design at all cost.
 
 - For some built-in functions calls, the specification just adds implicit conversions that normally are
   not allowed in regular OSL code. This means that the type-system is essentially bypassed, or at
