@@ -82,7 +82,7 @@ To begin with, the language itself has many flaws, of which I have collected a f
   int j = (int)"abcd";
   ```
 
-  While the latter is quite rightfully rejected, there is not much of a different between that
+  While the latter is quite rightfully rejected, there is not much of a difference between that
   expression and the former `1 && "abcd"`.
 
 - OSL has dedicated a `normal` type for normals, but the built-in function `calculatenormal`
