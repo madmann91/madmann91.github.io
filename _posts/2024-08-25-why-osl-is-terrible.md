@@ -78,6 +78,9 @@ time passes, as I know I am bound to find new issues as I progress with my own r
   int j = (int)"abcd";
   ```
 
+- OSL has dedicated a `normal` type for normals, but the built-in function `calculatenormal`
+  returns a `vector` instead.
+
 - Arguments are passed by reference, always. This prevents cross-module pointer provenance/aliasing
   analysis, and as a result produces slower code. Additionally, this also produces potentially
   surprising behavior at runtime:
