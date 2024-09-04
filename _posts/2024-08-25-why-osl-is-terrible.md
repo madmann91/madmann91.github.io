@@ -126,6 +126,16 @@ To begin with, the language itself has many flaws, of which I have collected a f
   reads and writes, and global variable accesses. Moreover, this also means that any compiler analysis
   has to do the same, which complicates cross-module analysis.
 
+- Optional arguments are allowed when calling certain built-in functions, and they are passed as
+  key-value pairs represented as a string identifying the key followed by the value associated with
+  it. This makes it hard to differentiate key-value pairs from a string followed by a value:
+
+  ```cpp
+  shader foo() {
+      bar("name", "albert"); // Maybe a key-value pair ("name" : "albert"), or just two unrelated strings
+  }
+  ```
+
 While OSL can be praised for having a specification at all, it is a rather low bar to clear,
 particularly when the specification itself is full of holes, contradicts itself, and leaves out
 essential bits of information.
@@ -228,6 +238,20 @@ it is due to the specification itself being poorly written:
   }
   shader foo() {
       printf("%f\n", f());
+  }
+  ```
+
+- Concerning optional arguments, the specification does not say if passing key-value pairs with a dynamic string as a key is
+  allowed. It does not even say whether keys always have to be strings:
+
+  > Optional arguments are key-value pairs with the key passed as an argument and the associated
+  > value passed as the subsequent argument
+
+  ```cpp
+  shader foo() {
+      texture("file.exr", 0, 0, "blur", 3);
+      string option = "blur";
+      texture("file.exr", 0, 0, option, 3); // Should that be supported? Probably not.
   }
   ```
 
@@ -358,7 +382,8 @@ issues that I have personally encountered with it:
   }
   ```
 
-- The implementation does not support the first variant of `spline` as defined in the specification:
+- The implementation does not support all the built-in functions that it is supposed to. For instance,
+  the first variant of `spline`, as defined in the specification, is not supported:
 
   >     type spline (string basis, float x, type y0 , type y1 , ... type yn-1)
   >     type spline (string basis, float x, type y[])
@@ -367,6 +392,20 @@ issues that I have personally encountered with it:
   ```cpp
   shader foo() {
       vector value = spline("bezier", 0.5, vector(1), vector(2)); // Rejected by the implementation
+  }
+  ```
+
+  Another example is the `min` function, which is defined like this in the specification:
+
+  > The min() and max() functions return the minimum or maximum, respectively, of a list
+  > of two or more values.
+
+  Note that, in particular, those functions should support more than just two values as arguments,
+  as per the description. However, the following code is rejected by the implementation:
+
+  ```cpp
+  shader foo() {
+      float f = max(1, 2, 3); // Rejected by the implementation
   }
   ```
 
