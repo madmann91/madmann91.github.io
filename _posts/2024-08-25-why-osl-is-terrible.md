@@ -22,6 +22,12 @@ time passes, as I know I am bound to find new issues as I progress with my own r
 
 To begin with, the language itself has many flaws, of which I have collected a few below:
 
+- Let's start this very boring list with a little joke. The 4th chapter of the OSL specification is titled:
+
+  > 4 Gross syntax, shader types, parameters
+
+  Which means, that, by the OSL designers' own admission, *OSL syntax is gross*. For once, I cannot agree more.
+
 - No boolean type exists in OSL, and integers are used instead. This harms readability of the shader
   source, as well as the performance of the resulting code (because 32-bit integers are used where
   1-bit, or perhaps 1-byte ones would have been enough). To add insult to injury, the language
@@ -254,6 +260,14 @@ it is due to the specification itself being poorly written:
       texture("file.exr", 0, 0, option, 3); // Should that be supported? Probably not.
   }
   ```
+
+- The OSL specification states that there is a "preprocessor", but is very vague about its
+  implementation, saying that:
+
+  > Shader source code is passed through a standard C preprocessor
+
+  Which "standard C preprocessor" are we talking about? C89? C99? C11? C23? Those do not behave the
+  same.
 
 For explanations or special cases that are not explained by the specification, one may think that it
 suffices to use the implementation to see how it behaves in those cases. However, that is foolish
